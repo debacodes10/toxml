@@ -9,4 +9,20 @@
 .convert-column { display:flex; flex-direction:column; align-items:center; gap:10px; color:#a1a79f; font:9px 'DM Mono'; letter-spacing:1px; } .convert-line { height:1px; background:var(--line); width:100%; } .convert-icon { width:33px; height:33px; background:var(--ink); color:var(--lime); border:0; padding:0; border-radius:50%; display:grid; place-items:center; font-size:17px; } .xml-preview { min-height:313px; max-height:313px; overflow:auto; margin:0; padding:22px 20px; white-space:pre-wrap; overflow-wrap:anywhere; font:10px/1.75 'DM Mono'; color:#526057; } .code-line { display:flex; gap:16px; white-space:nowrap; } .line-no { color:#c9cbc4; width:10px; text-align:right; } .tag { color:#e87545; font-weight:500; } .xml-preview i { color:#728876; font-style:normal; }.xml-preview strong { color:#657d43; font-weight:400; }.faded { color:#b9bdb7; }
 .output-foot { color:#6f8a59; } .output-foot > span:last-child { color:#9a9e98; }
 .how { border-top:1px solid var(--line); margin-top:76px; padding:35px 4px 42px; display:flex; justify-content:space-between; align-items:center; } .how p { max-width:525px; color:var(--muted); font-size:14px; line-height:1.6; margin:12px 0 0; } .download-button { background:var(--lime); color:var(--ink); border:0; border-radius:5px; padding:16px 18px 16px 21px; display:flex; gap:40px; align-items:center; font-weight:600; font-size:13px; box-shadow:0 2px 0 #b5d244; } .download-arrow { font-size:19px; line-height:10px; } footer { border-top:1px solid var(--line); color:#969b94; font:10px 'DM Mono'; padding:19px 0 28px; display:flex; justify-content:space-between; }
+button:focus-visible,a:focus-visible,textarea:focus-visible { outline:3px solid #98b937; outline-offset:3px; }
+button:disabled { cursor:not-allowed; opacity:.45; }
+textarea::placeholder { color:#a3aaa2; opacity:1; }
+.ghost-button:disabled { opacity:.4; }
+.input-actions { display:flex; align-items:center; gap:14px; }
+.mobile-convert { display:none; border:0; border-radius:4px; padding:7px 10px; background:var(--ink); color:var(--lime); font-size:11px; font-weight:600; }
+.convert-icon { width:38px; height:38px; font-size:19px; transition:transform .18s ease,background .18s ease; }
+.convert-icon:hover:not(:disabled) { transform:translateX(2px); background:#35483c; }
+.empty-preview { min-height:313px; display:flex; flex-direction:column; align-items:center; justify-content:center; gap:8px; color:#979e96; font-size:12px; text-align:center; }
+.empty-preview strong { color:#56635a; font:600 14px 'Space Grotesk'; }
+.empty-icon { display:grid; place-items:center; width:38px; height:38px; margin-bottom:5px; border:1px solid #e2e0d8; border-radius:10px; color:#9aab8c; font:13px 'DM Mono'; background:#f9f8f2; }
+.download-button { transition:filter .18s ease,transform .18s ease; }
+.download-button:hover:not(:disabled) { filter:brightness(.96); transform:translateY(-1px); }
 @media (max-width:850px) { .shell{padding:0 22px}.topbar{height:70px}.header-actions{gap:10px}.github{padding-left:10px} .hero{padding:58px 0 44px} h1{font-size:45px;letter-spacing:-2px}.workspace{grid-template-columns:1fr;gap:20px}.convert-column{display:none}.how{margin-top:45px;gap:24px;align-items:flex-start;flex-direction:column}.download-button{width:100%;justify-content:space-between}footer{gap:20px;flex-direction:column}.local-pill{display:none} }
+@media (max-width:850px) { .mobile-convert { display:inline-flex; align-items:center; gap:8px; } }
+@media (max-width:480px) { .shell{padding:0 16px}.brand{font-size:16px}.github{font-size:12px}.hero{padding:46px 0 34px}h1{font-size:39px;letter-spacing:-1.8px}.hero p{font-size:15px;line-height:1.55}.panel-head{padding:18px 16px 15px}.input-actions{gap:8px}.input-actions .ghost-button{font-size:11px}textarea{padding:18px 16px;min-height:280px;font-size:12px}.xml-preview,.empty-preview{min-height:280px;max-height:280px}.xml-preview{padding:18px 14px;font-size:9px}.panel-foot{padding:12px 15px;font-size:9px}.how{padding-left:0;padding-right:0} }
+@media (prefers-reduced-motion:reduce) { *,*::before,*::after { scroll-behavior:auto!important; transition:none!important; } }
