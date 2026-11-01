@@ -5,15 +5,68 @@ import { useMemo, useState } from "react";
 type Shape = { id: string; label: string; kind: string; x: number; y: number; width: number; height: number; row: number; col: number };
 type Edge = { id: string; source: string; target: string };
 
-const SAMPLE = `Page: Dashboard
-  Header: "Acme Analytics" [full-width]
-  Nav: "Overview" | "Reports" | "Settings"
-  Main:
-    Card: "Total revenue" | "$48,290" | "+12.5%"
-    Card: "Active users" | "2,840" | "+8.2%"
-    Chart: "Revenue overview" (line chart)
-    Table: "Recent transactions" [columns: Date, Customer, Amount, Status]
-  Footer: "© 2024 Acme Inc."`;
+const SAMPLE = `                              +------------------+
+                              |      Users       |
+                              | (Web / Mobile)   |
+                              +--------+---------+
+                                       |
+                                       v
+                      +-------------------------------+
+                      |      Front-End UI Layer       |
+                      |  HTML/CSS/JS / React / Vue    |
+                      +---------------+---------------+
+                                      |
+                                      v
+                     +--------------------------------+
+                     |        API Gateway /           |
+                     |      Application Server        |
+                     +------------+-------------------+
+                                  |
+        +-------------------------+-------------------------+
+        |                         |                         |
+        v                         v                         v
+
+ +---------------+      +-------------------+     +----------------+
+ | Authentication|      | Product Service   |     | Order Service  |
+ | & User Mgmt   |      | Catalog, Search   |     | Checkout       |
+ +------+--------+      +---------+---------+     +-------+--------+
+        |                         |                       |
+        |                         |                       |
+        v                         v                       v
+
+ +---------------+      +-------------------+     +----------------+
+ |  User DB      |      | Product DB        |     | Order DB       |
+ | Customers     |      | Inventory         |     | Orders         |
+ +---------------+      +-------------------+     +----------------+
+
+                                  |
+                                  v
+
+                        +-------------------+
+                        | Shopping Cart     |
+                        | & Wishlist        |
+                        +---------+---------+
+                                  |
+                                  v
+
+                        +-------------------+
+                        | Payment Gateway   |
+                        | Stripe / PayPal   |
+                        +---------+---------+
+                                  |
+                                  v
+
+                        +-------------------+
+                        | Shipping Service  |
+                        | FedEx / DHL / UPS |
+                        +---------+---------+
+                                  |
+                                  v
+
+                        +-------------------+
+                        | Email & SMS       |
+                        | Notifications     |
+                        +-------------------+`;
 
 function escapeXml(value: string) {
   return value.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;").replace(/'/g, "&#39;");
@@ -105,6 +158,25 @@ function buildXml(shapes: Shape[], edges: Edge[]) {
 
 function Icon({ children }: { children: React.ReactNode }) { return <span className="icon" aria-hidden="true">{children}</span>; }
 
+function DiagramPreview({ shapes, edges }: { shapes: Shape[]; edges: Edge[] }) {
+  const padding = 70;
+  const minX = Math.min(0, ...shapes.map((shape) => shape.x));
+  const minY = Math.min(0, ...shapes.map((shape) => shape.y));
+  const maxX = Math.max(900, ...shapes.map((shape) => shape.x + shape.width));
+  const maxY = Math.max(500, ...shapes.map((shape) => shape.y + shape.height));
+  const shapeMap = new Map(shapes.map((shape) => [shape.id, shape]));
+  return <section className="diagram-preview-section">
+    <div className="preview-heading"><div><div className="panel-kicker"><span className="step">03</span> PREVIEW</div><h2>See it before you download</h2><p>This is the same structure that will open in draw.io. Every node and connector stays editable.</p></div><span className="preview-badge"><span className="status-dot"></span> Live preview</span></div>
+    <div className="diagram-canvas" role="img" aria-label="Preview of generated draw.io diagram">
+      <svg viewBox={`${minX - padding} ${minY - padding} ${maxX - minX + padding * 2} ${maxY - minY + padding * 2}`} preserveAspectRatio="xMidYMin meet">
+        <defs><marker id="preview-arrow" markerWidth="8" markerHeight="8" refX="7" refY="4" orient="auto"><path d="M0,0 L8,4 L0,8 Z" fill="#7d877f" /></marker></defs>
+        {edges.map((edge) => { const source = shapeMap.get(edge.source); const target = shapeMap.get(edge.target); if (!source || !target) return null; return <line key={edge.id} x1={source.x + source.width / 2} y1={source.y + source.height} x2={target.x + target.width / 2} y2={target.y} stroke="#7d877f" strokeWidth="2" strokeDasharray={source.x === target.x ? undefined : "6 5"} markerEnd="url(#preview-arrow)" />; })}
+        {shapes.map((shape) => { const lines = shape.label.split(" · ").slice(0, 4); return <g key={shape.id}><rect x={shape.x} y={shape.y} width={shape.width} height={shape.height} rx="8" fill="#fffdf8" stroke="#b9b7ad" strokeWidth="1.5" /><rect x={shape.x} y={shape.y} width={shape.width} height="8" rx="8" fill="#26332c" /><rect x={shape.x} y={shape.y + 5} width={shape.width} height="4" fill="#26332c" />{lines.map((line, index) => <text key={`${shape.id}-${index}`} x={shape.x + 16} y={shape.y + 30 + index * 18} fill={index === 0 ? "#26332c" : "#778078"} fontSize={index === 0 ? "14" : "11"} fontWeight={index === 0 ? "600" : "400"} fontFamily="DM Sans, sans-serif">{line}</text>)}</g>; })}
+      </svg>
+    </div>
+  </section>;
+}
+
 export default function Home() {
   const [input, setInput] = useState(SAMPLE);
   const [convertedInput, setConvertedInput] = useState(SAMPLE);
@@ -129,7 +201,8 @@ export default function Home() {
       <div className="convert-column"><div className="convert-line"></div><button className="convert-icon" onClick={() => { setConvertedInput(input); setCopied(false); }} disabled={!hasInput} aria-label="Convert wireframe to XML">→</button><span>CONVERT</span></div>
       <div className="panel output-panel"><div className="panel-head"><div><div className="panel-kicker"><span className="step">02</span> OUTPUT</div><h2>Ready for draw.io</h2></div><button className="ghost-button" onClick={copy} disabled={!convertedInput.trim()}><Icon>{copied ? "✓" : "▣"}</Icon> {copied ? "Copied" : copyError ? "Copy unavailable" : "Copy XML"}</button></div>{convertedInput.trim() ? <pre className="xml-preview" aria-label="Generated draw.io XML">{xml}</pre> : <div className="empty-preview"><span className="empty-icon">&lt;/&gt;</span><strong>Your XML will appear here</strong><span>Enter a wireframe, then select Convert.</span></div>}<div className="panel-foot output-foot"><span><span className="status-dot"></span> {convertedInput.trim() ? "XML generated" : "Waiting for input"}</span><span>{shapes.length} elements · {diagram.edges.length} connectors</span></div></div>
     </section>
-    <section className="how"><div><div className="panel-kicker"><span className="step">03</span> NEXT STEP</div><h2>Take it to draw.io</h2><p>Download the XML and open it in draw.io. Everything is editable — move, style, and connect to make it yours.</p></div><button className="download-button" onClick={download} disabled={!convertedInput.trim()}><span>Download .drawio.xml</span><span className="download-arrow">↓</span></button></section>
+    <DiagramPreview shapes={shapes} edges={diagram.edges} />
+    <section className="how"><div><div className="panel-kicker"><span className="step">04</span> NEXT STEP</div><h2>Take it to draw.io</h2><p>Download the XML and open it in draw.io. Everything is editable — move, style, and connect to make it yours.</p></div><button className="download-button" onClick={download} disabled={!convertedInput.trim()}><span>Download .drawio.xml</span><span className="download-arrow">↓</span></button></section>
     <footer><span>Built for the messy middle between AI ideas and clear diagrams.</span><span>Private by default · No data leaves your browser</span></footer>
   </main>;
 }
